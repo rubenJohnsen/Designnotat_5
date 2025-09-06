@@ -1,0 +1,24 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# Filbane til datafilen (oppdatert sti hvis nødvendig)
+file_path = os.path.join(extract_path, "Ruben v2 mot v0.csv")
+
+# Les inn CSV-data, hopp over metadata (#-linjer), bruk riktig encoding
+data_v2_v0 = pd.read_csv(file_path, encoding="latin1", comment="#")
+
+# Gi kolonnene enklere navn
+data_v2_v0.columns = ["Time (s)", "V0 (V)", "V2 (V)"]
+
+# Lag plott
+plt.figure(figsize=(10,5))
+plt.plot(data_v2_v0["Time (s)"]*1000, data_v2_v0["V0 (V)"]*1000, label="Inngang $v_0$")
+plt.plot(data_v2_v0["Time (s)"]*1000, data_v2_v0["V2 (V)"]*1000, label="Utgang $v_2$")
+
+plt.title("Oscilloskopmåling av inngang og utgang")
+plt.xlabel("Tid [ms]")
+plt.ylabel("Spenning [mV]")
+plt.legend()
+plt.grid(True)
+plt.show()
