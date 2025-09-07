@@ -1,0 +1,32 @@
+import zipfile
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Pakk ut zip-filen
+zip_path = "/mnt/data/ESDA 2 - designnotat 4 - måledata.zip"
+extract_path = "/mnt/data/maaledata2"
+
+with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+    zip_ref.extractall(extract_path)
+
+# Les inn inngangsmotstandsfilen
+file_in = os.path.join(extract_path, "Ruben rms inngangsmotstand.csv")
+rin_data = pd.read_csv(file_in, encoding="latin1", comment="#")
+
+# Kolonner
+time_ms = rin_data["Time (s)"] * 1000
+V0_in = rin_data["Channel 1 (V)"]
+V1_in = rin_data["Channel 2 (V)"]
+
+# Plot inngangssignaler
+plt.figure(figsize=(10,5))
+plt.plot(time_ms, V0_in, label="$V_0$ (kilde)", linewidth=1.5)
+plt.plot(time_ms, V1_in, label="$V_1$ (base)", linewidth=1.5)
+plt.xlabel("Tid [ms]")
+plt.ylabel("Spenning [V]")
+plt.title("Målesignaler brukt til beregning av inngangsmotstand")
+plt.legend(loc="upper right", fontsize=10)
+plt.grid(True, linestyle="--", alpha=0.7)
+plt.tight_layout()
+plt.show()
