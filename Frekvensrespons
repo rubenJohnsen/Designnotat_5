@@ -1,0 +1,43 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Hent ut data for frekvens og magnitude
+freq = data_freq["Frequency (Hz)"]
+mag = data_freq["Channel 2 Magnitude (dB)"]
+
+# 1) Finn midtbåndsforsterkningen som gjennomsnitt i et flatt område (100 Hz – 100 kHz)
+midband = mag[(freq > 100) & (freq < 1e5)].mean()
+
+# 2) Sett -3 dB grense relativt til midtbåndsnivå
+target_level = midband - 3
+
+# 3) Finn nærmeste punkt til target_level i lav- og høyfrekvensområde
+lower_idx = (np.abs(mag[freq < 1000] - target_level)).idxmin()
+upper_idx = (np.abs(mag[freq > 1e5] - target_level)).idxmin()
+
+f_lower = freq[lower_idx]
+f_upper = freq[upper_idx]
+
+# 4) Plot frekvensresponsen
+plt.figure(figsize=(10,6))
+plt.semilogx(freq, mag, label="Overføring $A_v$", color="orange")
+plt.axhline(target_level, color="red", linestyle="--", label="Midtbånd - 3 dB")
+
+# Marker knekkfrekvensene
+plt.axvline(f_lower, color="blue", linestyle="--")
+plt.axvline(f_upper, color="blue", linestyle="--")
+plt.text(f_lower, target_level-5, f"{f_lower:.1f} Hz", rotation=90,
+         va="bottom", ha="right", color="blue")
+plt.text(f_upper, target_level-5, f"{f_upper/1e6:.2f} MHz", rotation=90,
+         va="bottom", ha="left", color="blue")
+
+plt.title("Målt frekvensrespons til bufferen")
+plt.xlabel("Frekvens [Hz]")
+plt.ylabel("Forsterkning [dB]")
+plt.grid(True, which="both", ls="--")
+plt.legend()
+plt.show()
+
+print("Midtbåndsforsterkning:", midband, "dB")
+print("Nedre knekkfrekvens:", f_lower, "Hz")
+print("Øvre knekkfrekvens:", f_upper, "Hz")
